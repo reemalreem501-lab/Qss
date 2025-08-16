@@ -1,0 +1,48 @@
+<html>
+<head>
+    <title>استمارة تسجيل الطالبات</title>
+</head>
+<body>
+    <h1>استمارة تسجيل الطالبات</h1>
+    <form id="registration-form">
+        <label for="name">الاسم:</label>
+        <input type="text" id="name" name="name" required><br>
+
+        <label for="email">البريد الإلكتروني:</label>
+        <input type="email" id="email" name="email" required><br>
+
+        <label for="phone">رقم الهاتف:</label>
+        <input type="tel" id="phone" name="phone" required><br>
+
+        <button type="submit">تسجيل</button>
+    </form>
+
+    <script>
+        document.getElementById('registration-form').onsubmit = function(event) {
+            event.preventDefault(); // منع الإرسال الافتراضي
+            let formData = new FormData(this);
+            let data = {};
+            formData.forEach((value, key) => {
+                data[key] = value;
+            });
+
+            // حفظ البيانات محليًا
+            localStorage.setItem('studentData', JSON.stringify(data));
+
+            // إنشاء ملف CSV تلقائي
+            let csvContent = 'data:text/csv;charset=utf-8,';
+            csvContent += 'اسم,بريد إلكتروني,رقم هاتف\n';
+            csvContent += `${data.name},${data.email},${data.phone}\n`;
+
+            // تحميل ملف CSV
+            let encodedUri = encodeURI(csvContent);
+            let link = document.createElement('a');
+            link.setAttribute('href', encodedUri);
+            link.setAttribute('download', 'student_registration.csv');
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        };
+    </script>
+</body>
+</html>
