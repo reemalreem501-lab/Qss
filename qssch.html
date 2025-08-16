@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>تسجيل طالبات قلعة سكر</title>
+<style>
+    body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        background: linear-gradient(135deg, #f6d365, #fda085);
+        transition: background 1s;
+    }
+    .container {
+        background-color: #fff;
+        padding: 30px;
+        border-radius: 20px;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+        width: 95%;
+        max-width: 500px;
+        text-align: center;
+        transition: transform 0.3s;
+    }
+    h2 {
+        color: #333;
+        margin-bottom: 20px;
+        font-size: 24px;
+    }
+    input, select {
+        width: 100%;
+        padding: 12px;
+        margin: 8px 0;
+        border-radius: 10px;
+        border: 1px solid #ccc;
+        font-size: 16px;
+        box-sizing: border-box;
+        transition: 0.3s, background-color 0.5s;
+    }
+    input:focus, select:focus {
+        border-color: #4CAF50;
+        box-shadow: 0 0 10px rgba(76,175,80,0.5);
+        outline: none;
+        background-color: #e0ffe0;
+    }
+    input:active, select:active {
+        transform: scale(1.02);
+    }
+    .dob-group {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 10px;
+    }
+    .dob-group select {
+        width: 32%;
+        background-color: #f0f8ff;
+    }
+    button.register-btn {
+        background: linear-gradient(45deg, #4CAF50, #81C784);
+        color: white;
+        border: none;
+        cursor: pointer;
+        font-size: 18px;
+        border-radius: 12px;
+        padding: 14px;
+        transition: transform 0.2s, background 0.5s;
+        margin-top: 10px;
+    }
+    button.register-btn:hover {
+        transform: scale(1.05);
+        background: linear-gradient(45deg, #45a049, #66bb6a);
+    }
+    #message {
+        color: green;
+        margin-top: 12px;
+        font-weight: bold;
+        transition: color 0.5s;
+    }
+</style>
+</head>
+<body>
+<div class="container">
+    <h2>تسجيل طالبات قلعة سكر</h2>
+    <input type="text" id="name" placeholder="اسم الطالبة">
+
+    <div class="dob-group">
+        <select id="day"></select>
+        <select id="month"></select>
+        <select id="year"></select>
+    </div>
+
+    <input type="tel" id="phone" placeholder="رقم الهاتف">
+
+    <select id="area">
+        <option value="">اختر المنطقة</option>
+        <option value="حي الشرق">حي الشرق</option>
+        <option value="حي السراي">حي السراي</option>
+        <option value="حي العسكري">حي العسكري</option>
+    </select>
+
+    <select id="branch">
+        <option value="">اختر الفرع</option>
+        <option value="الفرع العلمي">الفرع العلمي</option>
+        <option value="الفرع الأدبي">الفرع الأدبي</option>
+    </select>
+
+    <select id="school">
+        <option value="">المدرسة السابقة</option>
+        <option value="متوسطة الزهور">متوسطة الزهور</option>
+        <option value="متوسطة الروان">متوسطة الروان</option>
+        <option value="أخرى">أخرى</option>
+    </select>
+
+    <button class="register-btn" onclick="registerStudent()">تسجيل الطالبة</button>
+    <p id="message"></p>
+</div>
+
+<script>
+// قوائم اليوم والشهر والسنة
+const daySelect = document.getElementById('day');
+for(let i=1;i<=31;i++){
+    const option=document.createElement('option');
+    option.value=i;
+    option.textContent=i;
+    daySelect.appendChild(option);
+}
+const monthSelect = document.getElementById('month');
+for(let i=1;i<=12;i++){
+    const option=document.createElement('option');
+    option.value=i;
+    option.textContent=i;
+    monthSelect.appendChild(option);
+}
+const yearSelect = document.getElementById('year');
+for(let i=2008;i<=2010;i++){
+    const option=document.createElement('option');
+    option.value=i;
+    option.textContent=i;
+    yearSelect.appendChild(option);
+}
+
+// استرجاع البيانات السابقة
+let allStudents=JSON.parse(localStorage.getItem('allStudents')||"[]");
+
+function registerStudent(){
+    const name=document.getElementById('name').value.trim();
+    const day=daySelect.value;
+    const month=monthSelect.value;
+    const year=yearSelect.value;
+    const phone=document.getElementById('phone').value.trim();
+    const area=document.getElementById('area').value;
+    const branch=document.getElementById('branch').value;
+    const school=document.getElementById('school').value;
+
+    if(!name||!day||!month||!year||!phone||!area||!branch||!school){
+        alert("يرجى تعبئة جميع الحقول!");
+        return;
+    }
+
+    const dob=`${day.padStart(2,'0')}/${month.padStart(2,'0')}/${year}`;
+    const exists=allStudents.some(s=>s.name===name && s.school===school);
+    if(exists){
+        alert("هذه الطالبة مسجلة مسبقاً!");
+        return;
+    }
+
+    allStudents.push({name,dob,phone,area,branch,school});
+    const messageEl=document.getElementById('message');
+    messageEl.textContent=`${name} تم تسجيلها بنجاح!`;
+    messageEl.style.color=`hsl(${Math.random()*360},70%,40%)`;
+
+    // إعادة تعيين الحقول
+    document.getElementById('name').value="";
+    daySelect.value="";
+    monthSelect.value="";
+    yearSelect.value="";
+    document.getElementById('phone').value="";
+    document.getElementById('area').value="";
+    document.getElementById('branch').value="";
+    document.getElementById('school').value="";
+
+    // حفظ في LocalStorage
+    localStorage.setItem('allStudents',JSON.stringify(allStudents));
+
+    // حفظ تلقائي في ملف CSV
+    saveToFile();
+}
+
+function saveToFile(){
+    if(allStudents.length===0) return;
+    let csvContent="data:text/csv;charset=utf-8,";
+    csvContent+="الاسم,تاريخ الميلاد,رقم الهاتف,المنطقة,الفرع,المدرسة\n";
+    allStudents.forEach(s=>{
+        csvContent+=`${s.name},${s.dob},${s.phone},${s.area},${s.branch},${s.school}\n`;
+    });
+    const encodedUri=encodeURI(csvContent);
+    const link=document.createElement("a");
+    link.setAttribute("href",encodedUri);
+    link.setAttribute("download","طالبات_قلعة_سكر.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+</script>
+</body>
+</html>
