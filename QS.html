@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <title>تسجيل الطالبات - إعدادية قلعة سكر</title>
+  <style>
+    body { font-family: "Tahoma", sans-serif; direction: rtl; text-align: right; background: #f5f5f5; }
+    form { 
+      margin: 30px auto; 
+      padding: 25px; 
+      border: 1px solid #aaa; 
+      border-radius: 15px; 
+      width: 500px;   /* تكبير العرض */
+      background: #fff;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    h2 { text-align: center; }
+    label { display: block; margin-top: 12px; font-weight: bold; }
+    input, select, button { width: 100%; padding: 8px; margin-top: 5px; font-size: 15px; }
+    button { background: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer; }
+    button:hover { background: #45a049; }
+    #adminPanel { margin: 20px auto; padding: 20px; width: 500px; border: 1px dashed #666; border-radius: 10px; background: #f9f9f9; }
+  </style>
+</head>
+<body>
+
+  <h2>استمارة تسجيل الطالبات</h2>
+  <form id="regForm">
+    <label>الاسم الكامل:</label>
+    <input type="text" id="name" required>
+
+    <label>المنطقة:</label>
+    <select id="area" required>
+      <option value="">-- اختر --</option>
+      <option value="حي الشرق">حي الشرق</option>
+      <option value="حي السراي">حي السراي</option>
+    </select>
+
+    <label>المدرسة السابقة:</label>
+    <select id="school" required>
+      <option value="">-- اختر --</option>
+      <option value="متوسطة الزهور">متوسطة الزهور</option>
+      <option value="متوسطة الروان">متوسطة الروان</option>
+      <option value="اخرى">اخرى</option>
+    </select>
+
+    <label>الفرع:</label>
+    <select id="branch" required>
+      <option value="">-- اختر --</option>
+      <option value="علمي">علمي</option>
+      <option value="ادبي">أدبي</option>
+    </select>
+
+    <label>رقم هاتف ولي الأمر:</label>
+    <input type="tel" id="phone" pattern="07[0-9]{9}" placeholder="مثال: 07812345678" required>
+
+    <label>تاريخ التولد:</label>
+    <div style="display: flex; gap: 5px;">
+      <select id="day" required>
+        <option value="">اليوم</option>
+      </select>
+      <select id="month" required>
+        <option value="">الشهر</option>
+        <option value="1">يناير</option>
+        <option value="2">فبراير</option>
+        <option value="3">مارس</option>
+        <option value="4">ابريل</option>
+        <option value="5">مايو</option>
+        <option value="6">يونيو</option>
+        <option value="7">يوليو</option>
+        <option value="8">اغسطس</option>
+        <option value="9">سبتمبر</option>
+        <option value="10">اكتوبر</option>
+        <option value="11">نوفمبر</option>
+        <option value="12">ديسمبر</option>
+      </select>
+      <select id="year" required>
+        <option value="">السنة</option>
+      </select>
+    </div>
+
+    <button type="submit">تسجيل</button>
+  </form>
+
+  <!-- لوحة الإدارة -->
+  <div id="adminPanel">
+    <h3>لوحة الإدارة</h3>
+    <button onclick="downloadCSV()">تحميل ملف Excel (CSV)</button>
+  </div>
+
+  <script>
+    let students = [];
+
+    // تعبئة الأيام
+    let daySelect = document.getElementById("day");
+    for(let d=1; d<=31; d++){
+      let opt = document.createElement("option");
+      opt.value = d;
+      opt.text = d;
+      daySelect.add(opt);
+    }
+
+    // تعبئة السنوات (من 1990 إلى 2015 مثلا)
+    let yearSelect = document.getElementById("year");
+    for(let y=1990; y<=2015; y++){
+      let opt = document.createElement("option");
+      opt.value = y;
+      opt.text = y;
+      yearSelect.add(opt);
+    }
+
+    document.getElementById("regForm").addEventListener("submit", function(e){
+      e.preventDefault();
+
+      let name = document.getElementById("name").value;
+      let area = document.getElementById("area").value;
+      let school = document.getElementById("school").value;
+      let branch = document.getElementById("branch").value;
+      let phone = document.getElementById("phone").value;
+      let day = document.getElementById("day").value;
+      let month = document.getElementById("month").value;
+      let year = document.getElementById("year").value;
+
+      let birthdate = day + "/" + month + "/" + year;
+
+      students.push({name, area, school, branch, phone, birthdate});
+
+      this.reset();
+      alert("✅ تم تسجيل البيانات بنجاح");
+    });
+
+    function downloadCSV(){
+      if(students.length === 0){
+        alert("⚠️ لا توجد بيانات بعد");
+        return;
+      }
+
+      let csv = "الاسم,المنطقة,المدرسة السابقة,الفرع,رقم هاتف ولي الامر,تاريخ التولد\n";
+      students.forEach(st => {
+        csv += `${st.name},${st.area},${st.school},${st.branch},${st.phone},${st.birthdate}\n`;
+      });
+
+      let csvFile = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" });
+      let downloadLink = document.createElement("a");
+      downloadLink.download = "تسجيل_الطالبات.csv";
+      downloadLink.href = window.URL.createObjectURL(csvFile);
+      downloadLink.style.display = "none";
+      document.body.appendChild(downloadLink);
+      downloadLink.click();
+    }
+  </script>
+
+</body>
+</html>
